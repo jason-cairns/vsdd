@@ -1,0 +1,10 @@
+schema_version: 0.1
+
+tasks:
+  - id: TASK-000
+    status: draft
+    execution_status: pending
+    title: ""
+    objective: >
+      ""
+    notes: []
