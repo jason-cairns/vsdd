@@ -1,0 +1,16 @@
+schema_version: 0.1
+
+claims:
+  - id: CLAIM-000
+    status: draft
+    type: capability # capability | invariant | constraint | assumption | non-functional
+    title: ""
+    statement: >
+      ""
+    rationale: >
+      ""
+    scope:
+      in: []
+      out: []
+    tests: []
+    notes: []
