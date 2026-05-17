@@ -1,0 +1,12 @@
+schema_version: 0.1
+
+test_suites:
+  - id: TEST-000
+    status: draft
+    implementation_status: not-started
+    type: property # property | model | contract | regression | performance | security | example
+    title: ""
+    obligation: >
+      ""
+    tasks: []
+    notes: []
