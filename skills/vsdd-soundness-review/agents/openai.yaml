@@ -1,0 +1,4 @@
+interface:
+  display_name: "VSDD Soundness Review"
+  short_description: "Audit claim-test-task correspondence"
+  default_prompt: "Use $vsdd-soundness-review to audit whether recent work still satisfies VSDD artifacts."

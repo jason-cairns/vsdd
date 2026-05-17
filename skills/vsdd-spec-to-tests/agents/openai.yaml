@@ -1,0 +1,4 @@
+interface:
+  display_name: "VSDD Spec To Tests"
+  short_description: "Turn claims into test obligations"
+  default_prompt: "Use $vsdd-spec-to-tests to convert approved SPEC.yaml claims into TEST_PLAN.yaml obligations."

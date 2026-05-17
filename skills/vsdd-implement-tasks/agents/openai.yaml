@@ -1,0 +1,4 @@
+interface:
+  display_name: "VSDD Implement Tasks"
+  short_description: "Execute approved tasks with commits"
+  default_prompt: "Use $vsdd-implement-tasks to implement the next approved pending VSDD task."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "VSDD Tests To Tasks"
+  short_description: "Turn test obligations into tasks"
+  default_prompt: "Use $vsdd-tests-to-tasks to convert approved TEST_PLAN.yaml suites into TASKS.yaml work items."

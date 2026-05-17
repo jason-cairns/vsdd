@@ -1,0 +1,4 @@
+interface:
+  display_name: "VSDD Spec Gen"
+  short_description: "Draft small approved claim sets"
+  default_prompt: "Use $vsdd-spec-gen to interview me and draft SPEC.yaml claims."

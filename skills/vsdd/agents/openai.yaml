@@ -1,0 +1,4 @@
+interface:
+  display_name: "VSDD Router"
+  short_description: "Route VSDD work from repo artifacts"
+  default_prompt: "Use $vsdd to resume the verification-first workflow from repository artifacts."
