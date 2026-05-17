@@ -12,11 +12,13 @@ VSDD uses global repo-level artifacts, not feature-local bundles.
 
 - `CONTEXT.md` contains stable domain language, architectural boundaries, repo conventions, commands, testing norms, and other background needed by agents.
 - `SPEC.yaml` contains the global ordered claims: capabilities, invariants, constraints, assumptions, and non-functional expectations. This is the highest-level artifact and should involve the most human input.
-- `TEST_PLAN.yaml` contains reviewed test obligations linked under claims, including property-based tests, model-based tests, contract tests, regression tests, performance tests, security tests, and a small number of illustrative examples.
+- `TEST_PLAN.yaml` contains reviewed test obligations, including property-based tests, model-based tests, contract tests, regression tests, performance tests, security tests, and a small number of illustrative examples.
 - `TASKS.yaml` is the future work queue only. It is not history.
 - Git history is the record of completed work.
 
 The artifacts should stay small. If they become too large for a human to review, the workflow has failed. The purpose is to capture the true essence of the software, not to create bureaucracy.
+
+Artifact templates and examples are kept under `references/artifacts/`. Helper scripts for selective YAML queries are kept under `scripts/`.
 
 ## Preorder workflow
 
@@ -29,7 +31,14 @@ Claim
       -> commits for those tasks
 ```
 
-Claims contain or reference their tests. Tests contain or reference their tasks. Because that ancestry is encoded in the artifacts, implementation commits only need to reference the task ID. The claim and test ancestry can be recovered by walking backward through `TASKS.yaml`, `TEST_PLAN.yaml`, and `SPEC.yaml`.
+Ancestry is recorded without repeating parent information in child artifacts:
+
+- Claims list the tests that verify them.
+- Test suites list the tasks that implement them.
+- Tasks do not repeat their parent test or claim IDs.
+- Commits reference only the task ID.
+
+The claim and test ancestry for a task can be recovered by walking upward through `TEST_PLAN.yaml` and `SPEC.yaml`: find the test suite that lists the task, then find the claim that lists that test.
 
 A commit message should follow a standard task-linked pattern:
 
@@ -41,9 +50,9 @@ Completed tasks should be removed from `TASKS.yaml` after commit. Their durable 
 
 ## Status-driven state
 
-Every artifact carries enough status to resume after interruption. The router and subskills may use tools such as `yq` to search and update the YAML artifacts.
+Every artifact carries enough status to resume after interruption. The router and subskills should use tools such as `yq` to search and update only the relevant YAML sections rather than loading entire artifacts into context by default.
 
-The router should use statuses first and file order second. A top-level `next_action` field may exist, but it is only a routing hint. If `next_action` conflicts with item statuses, statuses win.
+There is no stored `next_action` field. The router derives the next action from statuses, file order, git history, and the preorder ancestry encoded in the artifacts.
 
 Typical statuses include:
 
@@ -53,13 +62,24 @@ Typical statuses include:
 
 Agents may draft and execute. Humans approve meaning. The higher the artifact, the more human-led it should be.
 
+## Routing helpers
+
+The scripts in `scripts/` are intended as reusable helpers for router and phase skills:
+
+- `select_ready_claims.sh` returns the first approved claims.
+- `select_ready_tests.sh` returns approved unfinished tests, optionally constrained to a claim by resolving the claim's listed tests.
+- `select_ready_tasks.sh` returns approved pending tasks, optionally constrained to a test by resolving the test suite's listed tasks.
+- `trace_last_completed_task.sh` finds the most recent task-linked commit, then resolves its test and claim ancestry by searching parent artifact links.
+
+The router should prefer continuing from the last completed task when possible. If the test suite containing that task still has approved pending tasks, continue there. If not, continue with the next approved unfinished test for the associated claim. If the claim is complete, continue with the next approved unfinished claim.
+
 ## Skills
 
 VSDD is operated by one user-facing router skill and several internal phase skills.
 
 ### `/vsdd`
 
-`/vsdd` is the router. On each invocation it reads `CONTEXT.md`, `SPEC.yaml`, `TEST_PLAN.yaml`, `TASKS.yaml`, and git history. It recomputes the next valid action from artifact statuses, compares it with any top-level `next_action`, and dispatches to the appropriate phase. It should not rely on chat history.
+`/vsdd` is the router. On each invocation it may read `CONTEXT.md`, inspect git history, and use selective YAML queries against `SPEC.yaml`, `TEST_PLAN.yaml`, and `TASKS.yaml`. It recomputes the next valid action from artifact statuses and preorder ancestry. It should not rely on chat history.
 
 ### `vsdd-spec-gen`
 
@@ -67,15 +87,15 @@ VSDD is operated by one user-facing router skill and several internal phase skil
 
 ### `vsdd-spec-to-tests`
 
-`vsdd-spec-to-tests` reads `CONTEXT.md` and `SPEC.yaml`, then produces or updates `TEST_PLAN.yaml`. Its job is not to write implementation tests immediately, but to draft test obligations for human review. It should prefer property-based, model-based, contract, regression, performance, and security tests over large piles of example tests.
+`vsdd-spec-to-tests` reads `CONTEXT.md` and relevant sections of `SPEC.yaml`, then produces or updates `TEST_PLAN.yaml`. It should also update each affected claim's `tests` list in `SPEC.yaml`. Its job is not to write implementation tests immediately, but to draft test obligations for human review. It should prefer property-based, model-based, contract, regression, performance, and security tests over large piles of example tests.
 
 ### `vsdd-tests-to-tasks`
 
-`vsdd-tests-to-tasks` reads `CONTEXT.md`, `SPEC.yaml`, and `TEST_PLAN.yaml`, then produces or updates `TASKS.yaml`. It still reads the spec for context; tasks should not be generated from the test plan alone. Each task should be small, reviewable, and suitable for one semantic commit.
+`vsdd-tests-to-tasks` reads `CONTEXT.md`, relevant sections of `SPEC.yaml`, and relevant sections of `TEST_PLAN.yaml`, then produces or updates `TASKS.yaml`. It should also update each affected test suite's `tasks` list in `TEST_PLAN.yaml`. It still reads the spec for context; tasks should not be generated from the test plan alone. Each task should be small, reviewable, and suitable for one semantic commit.
 
 ### `vsdd-implement-tasks`
 
-`vsdd-implement-tasks` reads the full global context, selects the next approved pending task in preorder, persists that it is in progress, and spawns subagents for execution. The orchestrator has the global view; subagents should not. Each subagent prompt should contain only the relevant task, its claim/test ancestry, allowed paths, forbidden paths, commands, expected output, and risk notes.
+`vsdd-implement-tasks` reads the relevant global context, selects the next approved pending task in preorder, persists that it is in progress, and spawns subagents for execution. The orchestrator has the global view; subagents should not. Each subagent prompt should contain only the relevant task, its resolved claim/test ancestry, allowed paths, forbidden paths, commands, expected output, and risk notes.
 
 The implementation orchestrator treats subagents as replaceable workers. It reviews their summaries, files touched, test results, and declared risks rather than performing a full manual-style diff review of every line. It may inspect deeper where risk warrants it. It rejects work that is locally optimal but violates global claims, architectural boundaries, or task scope, while recognizing that subagent work still has cost and should not be discarded casually.
 
