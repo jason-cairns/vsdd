@@ -1,0 +1,44 @@
+schema_version: 0.1
+
+test_suites:
+  - id: TEST-001
+    status: approved
+    implementation_status: partial
+    type: regression
+    title: "Fresh invocation resumes from repository artifacts"
+    obligation: >
+      Verify that a fresh /vsdd invocation can recover workflow state from
+      repository artifacts and git history.
+    tasks:
+      - TASK-001
+      - TASK-002
+    notes:
+      - "This test suite belongs to CLAIM-001 because CLAIM-001 lists TEST-001."
+      - "The router should not require TEST-001 to repeat its parent claim id."
+
+  - id: TEST-002
+    status: approved
+    implementation_status: not-started
+    type: contract
+    title: "Required artifacts have stable top-level schema"
+    obligation: >
+      Verify that SPEC.yaml, TEST_PLAN.yaml, and TASKS.yaml expose the expected
+      top-level collections and required item fields.
+    tasks:
+      - TASK-003
+    notes:
+      - "Schema validation should be lightweight and human-readable."
+
+  - id: TEST-003
+    status: approved
+    implementation_status: not-started
+    type: property
+    title: "Router selection follows status-derived preorder"
+    obligation: >
+      For any valid artifact state, the router selects the earliest unfinished
+      approved workflow item in preorder: claim, test, task, commit.
+    tasks:
+      - TASK-004
+    notes:
+      - "This test suite belongs to CLAIM-002 because CLAIM-002 lists TEST-003."
+      - "If the most recent completed task belongs to a test with remaining pending tasks, continue that test first."
