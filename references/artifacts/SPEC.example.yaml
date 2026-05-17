@@ -1,0 +1,49 @@
+schema_version: 0.1
+
+claims:
+  - id: CLAIM-001
+    status: approved
+    type: capability
+    title: "Repository artifacts are the workflow state"
+    statement: >
+      A VSDD workflow can be resumed from repository artifacts without relying
+      on prior chat history.
+    rationale: >
+      The chat session is disposable; the repository must contain durable state.
+    scope:
+      in:
+        - CONTEXT.md
+        - SPEC.yaml
+        - TEST_PLAN.yaml
+        - TASKS.yaml
+        - git history
+      out:
+        - hidden chat state
+        - local scratch state
+    tests:
+      - TEST-001
+      - TEST-002
+    notes:
+      - "The router may read CONTEXT.md fully, but should query YAML artifacts selectively."
+
+  - id: CLAIM-002
+    status: approved
+    type: invariant
+    title: "Routing is derived from artifact status"
+    statement: >
+      The router determines the next valid workflow step from claim, test, task,
+      and git status rather than from a stored next_action field.
+    rationale: >
+      Derived routing avoids stale or contradictory workflow hints.
+    scope:
+      in:
+        - "approved claims without tests"
+        - "approved tests without tasks"
+        - "approved pending tasks"
+        - "git commits linked to completed task IDs"
+      out:
+        - "manual next_action routing"
+    tests:
+      - TEST-003
+    notes:
+      - "When resuming after a commit, trace the last completed TASK id through test and claim parent links."
