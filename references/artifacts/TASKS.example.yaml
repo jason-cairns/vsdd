@@ -1,0 +1,40 @@
+schema_version: 0.1
+
+tasks:
+  - id: TASK-002
+    status: approved
+    execution_status: pending
+    title: "Select relevant YAML sections with yq"
+    objective: >
+      Add selectors that retrieve only approved unfinished claims, tests, and
+      tasks needed for the current routing decision.
+    notes:
+      - "This task belongs to TEST-001 because TEST-001 lists TASK-002."
+      - "Prefer small yq queries over loading entire YAML artifacts into the prompt."
+      - "Preserve preorder semantics."
+      - "Do not infer workflow state from chat history."
+
+  - id: TASK-003
+    status: approved
+    execution_status: pending
+    title: "Add lightweight artifact schema checks"
+    objective: >
+      Add validation for required top-level fields and required per-item fields
+      in SPEC.yaml, TEST_PLAN.yaml, and TASKS.yaml.
+    notes:
+      - "This task belongs to TEST-002 because TEST-002 lists TASK-003."
+      - "Keep validation understandable to humans."
+      - "Avoid turning VSDD into a heavy bureaucracy."
+
+  - id: TASK-004
+    status: needs-review
+    execution_status: pending
+    title: "Implement resume routing from last completed task"
+    objective: >
+      Use the most recent task-linked commit to locate the corresponding test
+      and claim, then select the next unfinished approved task, test, or claim.
+    notes:
+      - "This task belongs to TEST-003 because TEST-003 lists TASK-004."
+      - "Commit messages should match TASK-NNN: summary."
+      - "If the current test still has pending approved tasks, continue there."
+      - "If not, move to the next approved unfinished test for the claim."
