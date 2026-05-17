@@ -9,10 +9,10 @@ Turn reviewed test obligations into implementation tasks. Tasks are future work 
 
 ## Workflow
 
-1. Read `CONTEXT.md` if present.
+1. Read `CONTEXT.md` as the context map if present.
 2. Read the relevant approved claims from `SPEC.yaml`; do not generate tasks from the test plan alone.
 3. Select approved test suites from `TEST_PLAN.yaml` whose `implementation_status` is not `implemented`.
-4. Add or revise small tasks in `TASKS.yaml` with safe boundaries and ordering for human review.
+4. Add or revise small tasks in `TASKS.yaml` with safe boundaries and ordering for human review. If required context is missing or underspecified, create discovery tasks before implementation tasks.
 5. Update each affected test suite's `tasks` list in `TEST_PLAN.yaml`.
 6. Mark new or materially changed tasks `needs-review` unless the user explicitly approves them.
 
@@ -21,6 +21,8 @@ Turn reviewed test obligations into implementation tasks. Tasks are future work 
 Each task should be suitable for one semantic commit and should include objective plus risk or boundary notes where useful. Do not repeat parent test or claim IDs inside task objects; ancestry is recovered from parent artifact links.
 
 Use `approved` plus `execution_status: pending` only when the human has accepted the task boundary.
+
+Discovery tasks are valid when implementation depends on missing context, such as EDA over messy data or stakeholder clarification. Their objective should include updating `CONTEXT.md` or the downstream context file mapped from it so later agents inherit the finding.
 
 See `references/task-artifact.md` for the YAML shape and an example.
 

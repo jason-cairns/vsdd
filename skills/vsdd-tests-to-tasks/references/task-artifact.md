@@ -22,5 +22,7 @@ Task rules:
 - Use `execution_status: pending` for work the agent may implement.
 - Do not repeat parent test or claim IDs in task objects.
 - Add the task ID to the parent test suite's `tasks` list in `TEST_PLAN.yaml`.
+- Use discovery tasks when required context is missing or underspecified.
+- Discovery tasks should update `CONTEXT.md` or a downstream file mapped from it, not leave durable findings in chat.
 
 Completed tasks are removed from `TASKS.yaml` after commit unless the repo explicitly chooses retention. The commit message is the durable history record.

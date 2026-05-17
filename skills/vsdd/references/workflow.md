@@ -2,7 +2,7 @@
 
 VSDD is a human-in-the-loop, verification-first workflow for agentic software development. It exists because large agent-generated pull requests are hard to trust when the review object is mostly implementation volume and local test output. Move trust into small, durable, human-reviewable artifacts that capture what must be true, how it is tested, and what future work remains.
 
-Core conjecture: most useful software can be described by a small number of high-quality claims. Do not generate claims mechanically; draw them out through human-agent planning, ambiguity challenges, examples, and counterexamples.
+Core conjecture: most useful software rests on a small number of high-quality claims. Do not explode the spec into hundreds of claims: good products usually depend on a few product truths, and humans must be able to review them. Draw claims out through human-agent planning, ambiguity challenges, examples, and counterexamples.
 
 Central rule:
 
@@ -14,13 +14,26 @@ The chat is not the workflow state. The repository is the workflow state.
 
 Use global repo-level artifacts, not feature-local bundles:
 
-- `CONTEXT.md`: stable domain language, architecture boundaries, repo conventions, commands, testing norms, and agent background.
+- `CONTEXT.md`: map to stable domain language, architecture boundaries, repo conventions, commands, testing norms, and downstream context files. Keep detailed terrain in mapped files, not in the chat or bloated claims.
 - `SPEC.yaml`: global ordered claims: capabilities, invariants, constraints, assumptions, and non-functional expectations. This is the highest artifact and needs the most human input.
 - `TEST_PLAN.yaml`: reviewed test obligations: property, model, contract, regression, performance, security, and a small number of illustrative examples.
 - `TASKS.yaml`: future work queue only; it is not history.
 - Git history: durable record of completed work.
 
 Keep artifacts small. If they become too large for human review, the workflow has failed; the goal is essence, not bureaucracy.
+
+## Claim Boundary
+
+`SPEC.yaml` contains product truths, not environmental inventories, implementation tactics, or data-cleaning checklists. Promote a detail into a claim only when a human product/domain reviewer must approve it as part of what the product is.
+
+Use `CONTEXT.md` as a map when details are important but not claims:
+
+- messy source systems, corrupt values, data dictionaries, stakeholder notes, and anomaly catalogs belong downstream of the `CONTEXT.md` map;
+- a claim may say a dataset satisfies a model input contract, with assumptions or notes pointing to mapped context;
+- `TEST_PLAN.yaml` proves the claim against those known terrain details;
+- `TASKS.yaml` decomposes discovery or implementation work needed to make the claim true.
+
+When spec work uncovers new domain context, update `CONTEXT.md` or a downstream file it maps to. Do not hide new durable context in chat.
 
 ## Preorder
 
